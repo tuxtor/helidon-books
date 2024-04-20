@@ -4,7 +4,7 @@ Helidon MP application that uses the dbclient API with MySQL database.
 
 ## Getting started
 
-To execute this example you will need to run a MySQL database with the following dummy credentials
+To execute this example you need to run a MySQL database with (dummy?) credentials
 
 Database: books
 Username: user
@@ -14,7 +14,10 @@ JDBC Url: jdbc:mysql://127.0.0.1:3306/books?useSSL=false
 You could start this database by using Docker, please note this database will be deleted after stopping the container:
 
 ```bash
-docker run --name helidon-books --rm -e MYSQL_RANDOM_ROOT_PASSWORD=yes -e MYSQL_USER=user -e MYSQL_PASSWORD=changeit -e MYSQL_DATABASE=books -p 3306:3306 mysql:8.3
+docker run --name helidon-books-db --rm -e MYSQL_RANDOM_ROOT_PASSWORD=yes \
+  -e MYSQL_USER=user \
+  -e MYSQL_PASSWORD=changeit \
+  -e MYSQL_DATABASE=books -p 3306:3306 mysql:8.3
 ```
 
 ## Build and run
@@ -24,7 +27,7 @@ With JDK21
 ```bash
 mvn package
 
-#Same as docker execution above
+#Same values as the database
 export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/books?useSSL=false&allowPublicKeyRetrieval=true"
 export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user
 export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit
@@ -34,89 +37,53 @@ java -jar target/helidon-books.jar
 
 ## Build and run with Docker
 
+
+### Mac
+
 ```bash
-export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/books?useSSL=false&allowPublicKeyRetrieval=true"
-export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user
-export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit
+mvn clean verify k8s:build
 
+docker run --name helidon-books --rm \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://host.docker.internal:3306/books?useSSL=false&allowPublicKeyRetrieval=true" \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit \
+  -p 8080:8080 \
+  tuxtor/helidon-books:latest
 ```
 
+### Linux (Bare metal Docker)
 
-## Building a Native Image
+```bash
+mvn clean verify k8s:build
 
-The generation of native binaries requires an installation of GraalVM 22.1.0+.
-
-You can build a native binary using Maven as follows:
-
+docker run --name helidon-books --rm \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://localhost:3306/books?useSSL=false&allowPublicKeyRetrieval=true" \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user \
+  -e JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit \
+  -p 8080:8080 \
+  tuxtor/helidon-books:latest
 ```
-mvn -Pnative-image install -DskipTests
-```
-
-The generation of the executable binary may take a few minutes to complete depending on
-your hardware and operating system. When completed, the executable file will be available
-under the `target` directory and be named after the artifact ID you have chosen during the
-project generation phase.
-
-
-
-### Database Setup
-
-Start your database before running this example.
-
-Example docker commands to start databases in temporary containers:
-
-MySQL:
-```
-docker run --rm --name mysql -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=root \
-    -e MYSQL_DATABASE=pokemon \
-    -e MYSQL_USER=user \
-    -e MYSQL_PASSWORD=changeit \
-    mysql:5.7
-```
-
-
-
-## Building the Docker Image
-
-```
-docker build -t helidon-books .
-```
-
-## Running the Docker Image
-
-```
-docker run --rm -p 8080:8080 helidon-books:latest
-```
-
-Exercise the application as described above.
-                                
 
 ## Run the application in Kubernetes
 
-If you don’t have access to a Kubernetes cluster, you can [install one](https://helidon.io/docs/latest/#/about/kubernetes) on your desktop.
+If you don’t have access to a Kubernetes cluster, you can [install one](https://helidon.io/docs/latest/#/about/kubernetes) on your desktop and use it as the default kubernetes cluster.
 
-### Verify connectivity to cluster
+Currently JKube is configured to publish the image at Dockerhub
 
-```
-kubectl cluster-info                        # Verify which cluster
-kubectl get pods                            # Verify connectivity to cluster
-```
-
-### Deploy the application to Kubernetes
-
-```
-kubectl create -f app.yaml                              # Deploy application
-kubectl get pods                                        # Wait for quickstart pod to be RUNNING
-kubectl get service  helidon-books                     # Get service info
-kubectl port-forward service/helidon-books 8081:8080   # Forward service port to 8081
+```xml
+<properties>
+    <jkube.generator.name>tuxtor/helidon-books:%l</jkube.generator.name>
+</properties>
 ```
 
-You can now exercise the application as you did before but use the port number 8081.
+You could adapt this part to use [another registry](https://eclipse.dev/jkube/docs/kubernetes-maven-plugin/#registry) -e.g. AWS, Oracle Cloud, Azure-. Then you could simply execute
 
-After you’re done, cleanup.
-
-```
-kubectl delete -f app.yaml
+```xml
+mvn k8s:build k8s:push
 ```
 
+To execute the application, they you could generate the final Kubernetes descriptor and apply it
+
+```xml
+mvn k8s:resource k8s:apply
+```

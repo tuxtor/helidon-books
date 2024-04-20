@@ -2,7 +2,6 @@ package com.vorozco.books.controller;
 
 import com.vorozco.books.model.Book;
 import com.vorozco.books.repository.BookRepository;
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
