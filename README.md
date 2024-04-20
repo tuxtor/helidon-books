@@ -14,7 +14,6 @@ JDBC Url: jdbc:mysql://127.0.0.1:3306/books?useSSL=false
 You could start this database by using Docker, please note this database will be deleted after stopping the container:
 
 ```bash
-docker run --name helidon-books --rm -e MYSQL_USER=user -e MYSQL_PASSWORD=changeit -e MYSQL_DATABASE=books -p 3306:3306 -d mysql:8.3
 docker run --name helidon-books --rm -e MYSQL_RANDOM_ROOT_PASSWORD=yes -e MYSQL_USER=user -e MYSQL_PASSWORD=changeit -e MYSQL_DATABASE=books -p 3306:3306 mysql:8.3
 ```
 
@@ -24,55 +23,21 @@ docker run --name helidon-books --rm -e MYSQL_RANDOM_ROOT_PASSWORD=yes -e MYSQL_
 With JDK21
 ```bash
 mvn package
+
+#Same as docker execution above
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/books?useSSL=false&allowPublicKeyRetrieval=true"
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit
+
 java -jar target/helidon-books.jar
 ```
 
-## Exercise the application
+## Build and run with Docker
 
-Basic:
-```
-curl -X GET http://localhost:8080/simple-greet
-Hello World!
-```
-
-
-JSON:
-```
-curl -X GET http://localhost:8080/greet
-{"message":"Hello World!"}
-
-curl -X GET http://localhost:8080/greet/Joe
-{"message":"Hello Joe!"}
-
-curl -X PUT -H "Content-Type: application/json" -d '{"greeting" : "Hola"}' http://localhost:8080/greet/greeting
-
-curl -X GET http://localhost:8080/greet/Jose
-{"message":"Hola Jose!"}
-```
-
-
-
-## Try metrics
-
-```
-# Prometheus Format
-curl -s -X GET http://localhost:8080/metrics
-# TYPE base:gc_g1_young_generation_count gauge
-. . .
-
-# JSON Format
-curl -H 'Accept: application/json' -X GET http://localhost:8080/metrics
-{"base":...
-. . .
-```
-
-
-
-## Try health
-
-```
-curl -s -X GET http://localhost:8080/health
-{"outcome":"UP",...
+```bash
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/books?useSSL=false&allowPublicKeyRetrieval=true"
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER=user
+export JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD=changeit
 
 ```
 

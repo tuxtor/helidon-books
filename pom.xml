@@ -13,6 +13,10 @@
     <artifactId>helidon-books</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <jkube.generator.name>tuxtor/helidon-books:%l</jkube.generator.name>
+    </properties>
+
 
     <dependencies>
         <dependency>
@@ -181,6 +185,11 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jkube</groupId>
+                <artifactId>kubernetes-maven-plugin</artifactId>
+                <version>1.16.2</version>
             </plugin>
         </plugins>
     </build>

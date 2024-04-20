@@ -1,0 +1,21 @@
+spec:
+  template:
+    spec:
+      containers:
+        - imagePullPolicy: Always
+          env:
+            - name: JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+            - name: JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+            - name: JAVAX_SQL_DATASOURCE_BOOKSDS_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: url
