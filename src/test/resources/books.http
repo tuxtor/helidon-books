@@ -1,0 +1,29 @@
+### GET request
+GET {{http_host}}/books
+Accept: application/json
+
+### POST request
+POST {{http_host}}/books
+Content-Type: application/json
+
+{
+  "title": "Operating System Concepts",
+  "description": "The tenth edition of Operating System Concepts has been revised to keep it fresh and up-to-date with contemporary examples of how operating systems function, as well as enhanced interactive elements to improve learning and the student's experience with the material.",
+  "isbn": "1119800366"
+}
+
+
+### PUT request
+PUT {{http_host}}/books/1
+Content-Type: application/json
+
+{
+  "bookId": "1",
+  "title": "Operating System Concepts",
+  "description": "New interactive self-assessment problems are provided throughout the text to help students monitor their level of understanding and progress. A Linux virtual machine (including C and Java source code and development tools) allows students to complete programming exercises that help them engage further with the material.",
+  "isbn": "1119800366"
+}
+
+### DELETE request
+DELETE {{http_host}}/books/1
+Content-Type: application/json
